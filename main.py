@@ -12,7 +12,8 @@ import json
 app = FastAPI()
 
 # Cargamos el archivo
-df = pd.read_csv('movies_dataset_clean.csv')
+df = pd.read_csv(r'datasets/movies_dataset_clean.csv')
+
 df['release_date'] = pd.to_datetime(df['release_date'])
 df['release_month'] = df['release_date'].dt.month_name()
 df['release_day'] = df['release_date'].dt.day_name()
