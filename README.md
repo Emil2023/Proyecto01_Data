@@ -33,3 +33,4 @@ Para lograr el deploy tuve que usar render y subirlo para que pueda ser utilizad
 - Scikit-Learn
 
 #Link de la api
+https://emilioproject07.onrender.com/docs
