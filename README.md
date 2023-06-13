@@ -16,13 +16,14 @@ Aplique los métodos de extracción, transformación y carga (ETL) para preparar
 - Desarrollar la API a través de la librería FastAPI.
 - Hacer el deploy de la API en Render.
 
-- ***Analisis Exploratorio***
+## ***Analisis Exploratorio***
 Realice un análisis de investigación de datos (EDA) para obtener información sobre películas, como el encabezado, la descripción general y los géneros.
 Realice un Grafico de valores faltantes 
 
-- ***Desarrollo de la API***
+## ***Desarrollo de la API***
 Diseñe e implemente una serie de funciones y API integradas sin ningún problema con el sistema recomendado basado en el contenido,Verificando que este Disponible para el cliente.
-- ***Deployment***
+
+## ***Deployment***
 Para lograr el deploy tuve que usar render y subirlo para que pueda ser utilizada por la web
 
 ## Librerias Utilizadas
@@ -32,5 +33,6 @@ Para lograr el deploy tuve que usar render y subirlo para que pueda ser utilizad
 - Numpy
 - Scikit-Learn
 
-#Link de la api
+## Link de la api
 https://emilioproject07.onrender.com/docs
+![]=https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png
