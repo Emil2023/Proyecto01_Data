@@ -1,12 +1,15 @@
-
-from fastapi import FastAPI
-
 #Importamos librerias
-
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 import pandas as pd
-from typing import Union
-import unicodedata as unicodedata
-import json
+import datetime as dt
+import locale
+import ast
+import numpy as np
+import time
+import asyncio
+from sklearn.neighbors import NearestNeighbors
 
 #Clase de la api
 app = FastAPI()
@@ -144,7 +147,57 @@ def get_director(nombre_director:str):
         }
     else:
         return f"No se encontraron registros para el director {nombre_director}."
-    
+  #ML
+@app.get('/recomendacion/{titulo}')
+def recomendacion(titulo: str):
+    df = pd.read_csv(r"C:\Users\WINDOW 10\Desktop\Labs 2\movie_dataset_clean.csv")
+    '''
+    Recibe un título de película y retorna un diccionario con la lista recomendada de películas similares.
+    '''
+    # Eliminar filas con valores NaN en columnas importantes
+    df = df.dropna(subset=['overview', 'tagline', 'genre_names', 'title', 'id'])
+
+    # Convertir la columna 'genre_names' de cadena a lista
+    df['genre_names'] = df['genre_names'].apply(lambda x: ast.literal_eval(x) if isinstance(x, str) else x)
+
+    # Crear dataframe de géneros utilizando one-hot encoding
+    generos_df = df['genre_names'].str.get_dummies('|')
+
+    # Definir título seleccionado
+    selected_title = titulo
+
+    # Obtener los géneros del título seleccionado
+    selected_genres = df.loc[df['title'] == selected_title]['genre_names'].values[0]
+
+    # Calcular la similitud de géneros entre los títulos y el título seleccionado
+    df['genre_similarity'] = df['genre_names'].apply(lambda x: len(set(selected_genres) & set(x)) / len(set(selected_genres) | set(x)))
+
+    # Crear columna 'same_series' para indicar si el título contiene 'Batman'
+    df['same_series'] = df['title'].apply(lambda x: 1 if 'Batman' in x else 0)
+
+    # Crear dataframe de características para el algoritmo de vecinos más cercanos
+    features_df = pd.concat([generos_df, df['vote_average'], df['genre_similarity'], df['same_series']], axis=1)
+
+    # Configurar el algoritmo de vecinos más cercanos
+    k = 6
+    knn = NearestNeighbors(n_neighbors=k+1, algorithm='auto')
+    knn.fit(features_df)
+
+    # Obtener los índices de los títulos recomendados
+    indices = knn.kneighbors(features_df.loc[df['title'] == selected_title])[1].flatten()
+
+    # Obtener los títulos recomendados y ordenarlos según criterios de puntuación y similitud de género
+    recommended_movies = list(df.iloc[indices]['title'])
+    selected_score = df.loc[df['title'] == selected_title]['vote_average'].values[0]
+    recommended_movies = sorted(recommended_movies, key=lambda x: (df.loc[df['title'] == x]['same_series'].values[0], df.loc[df['title'] == x]['vote_average'].values[0], df.loc[df['title'] == x]['genre_similarity'].values[0]), reverse=True)
+    recommended_movies = [movie for movie in recommended_movies if movie != selected_title]
+
+    # Construir la respuesta
+    respuesta = {
+        'lista_recomendada': recommended_movies[:5]
+    }
+
+    return {'lista_recomendada': respuesta}
 
 
 
