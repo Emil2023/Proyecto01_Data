@@ -15,7 +15,7 @@ from sklearn.neighbors import NearestNeighbors
 app = FastAPI()
 
 # Cargamos el archivo
-df = pd.read_csv("movies_dataset_clean.csv")
+df = pd.read_csv("movie_dataset_clean.csv")
 
 df['release_date'] = pd.to_datetime(df['release_date'])
 df['release_month'] = df['release_date'].dt.month_name()
